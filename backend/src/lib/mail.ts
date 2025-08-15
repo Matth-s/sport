@@ -1,15 +1,17 @@
 import { Resend } from 'resend';
-import { RESEND_KEY, betterAuthUrl } from './env-config';
+import { RESEND_KEY, frontendUrl } from './env-config';
 
 const resend = new Resend(RESEND_KEY);
 
 export const sendEmailVerification = async ({
   email,
-  url,
+  token,
 }: {
   email: string;
-  url: string;
+  token: string;
 }) => {
+  const url = `${frontendUrl}/authentification/confirmation?token=${token}`;
+
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
       <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">

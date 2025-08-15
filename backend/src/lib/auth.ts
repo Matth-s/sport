@@ -1,18 +1,25 @@
-import { betterAuth } from 'better-auth';
+import { APIError, betterAuth, BetterAuthError } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import prisma from './prisma';
 
 //better auth plugins
 import { username } from 'better-auth/plugins';
 import { comparePassword, hashPassword } from './bcrypt';
-import { getUserByName } from '../data/user-data';
 import {
   sendEmailVerification,
   sendPasswordResetEmail,
 } from './mail';
-import { betterAuthSecret } from './env-config';
+import { betterAuthSecret, frontendUrl } from './env-config';
+import { getUserByName } from '../data/user-data';
 
 export const auth = betterAuth({
+  onAPIError: {
+    throw: true,
+    onError: (error, ctx) => {
+      console.error('Auth error:', error);
+    },
+    errorURL: '/auth/error',
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
@@ -41,15 +48,33 @@ export const auth = betterAuth({
     },
   },
 
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await prisma.user.update({
+            where: {
+              id: user.id,
+            },
+            data: {
+              username: user.name,
+              name: user.username as string,
+            },
+          });
+        },
+      },
+    },
+  },
+
   emailVerification: {
     sendOnSignIn: true,
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     expiresIn: 15 * 60, // 15 min
 
-    sendVerificationEmail: async ({ user, url }) => {
+    sendVerificationEmail: async ({ user, token }) => {
       return await sendEmailVerification({
-        url,
+        token,
         email: user.email,
       });
     },
@@ -84,6 +109,8 @@ export const auth = betterAuth({
       },
     }),
   ],
+
+  trustedOrigins: [frontendUrl as string],
 
   advanced: {
     useSecureCookies: true,

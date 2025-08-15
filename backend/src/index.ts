@@ -1,17 +1,16 @@
 import express from 'express';
-import { port } from './lib/env-config';
+import { frontendUrl, port } from './lib/env-config';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
 import cors from 'cors';
 import helmet from 'helmet';
 
 const app = express();
-
 app.use(helmet());
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: frontendUrl,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
