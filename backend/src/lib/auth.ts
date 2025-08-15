@@ -6,12 +6,18 @@ import prisma from './prisma';
 import { username } from 'better-auth/plugins';
 import { comparePassword, hashPassword } from './bcrypt';
 import { getUserByName } from '../data/user-data';
+import {
+  sendEmailVerification,
+  sendPasswordResetEmail,
+} from './mail';
+import { betterAuthSecret } from './env-config';
 
 export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
 
+    //fonction de hachage
     password: {
       hash: async (password: string): Promise<string> => {
         return await hashPassword(password);
@@ -26,15 +32,41 @@ export const auth = betterAuth({
         return await comparePassword(password, hash);
       },
     },
+
+    sendResetPassword: async ({ user, url }) => {
+      await sendPasswordResetEmail({
+        email: user.email,
+        url,
+      });
+    },
   },
 
   emailVerification: {
     sendOnSignIn: true,
     sendOnSignUp: true,
-    sendVerificationEmail: async ({ token, user }) => {
-      return console.log('send email', token, user);
+    autoSignInAfterVerification: true,
+    expiresIn: 15 * 60, // 15 min
+
+    sendVerificationEmail: async ({ user, url }) => {
+      return await sendEmailVerification({
+        url,
+        email: user.email,
+      });
     },
   },
+
+  //session
+  session: {
+    cookieCache: {
+      enabled: true,
+    },
+    freshAge: 60 * 60, // 1 hours
+    expiresIn: 60 * 60 * 6, //6 hours
+    updateAge: 60 * 60, // 1 hours
+  },
+
+  //better auth secret
+  secret: betterAuthSecret,
 
   //plugins
   plugins: [

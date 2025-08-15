@@ -1,10 +1,13 @@
 import express from 'express';
-import { betterAuthUrl, port } from './lib/env-config';
+import { port } from './lib/env-config';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './lib/auth';
 import cors from 'cors';
+import helmet from 'helmet';
 
 const app = express();
+
+app.use(helmet());
 
 app.use(
   cors({
