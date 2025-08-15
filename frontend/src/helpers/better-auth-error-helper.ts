@@ -14,6 +14,18 @@ export const formatBetterAuthError = (code: string): string => {
       message = "Ce nom d'utilisateur est déjà utilisé";
       break;
 
+    case 'INVALID_USERNAME_OR_PASSWORD':
+      message = "Nom d'utilisateur ou de passe invalide";
+      break;
+
+    case 'INVALID_EMAIL_OR_PASSWORD':
+      message = 'Email ou de passe invalide';
+      break;
+
+    case 'EMAIL_NOT_VERIFIED':
+      message = 'Veuillez confirmer votre email';
+      break;
+
     default:
       message = 'Une erreur inconnue est survenue';
   }

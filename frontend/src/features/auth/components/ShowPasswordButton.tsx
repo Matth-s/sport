@@ -1,6 +1,6 @@
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import React from 'react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import React from "react";
 
 type ShowPasswordButtonProps = {
   text: string;
@@ -14,7 +14,7 @@ const ShowPasswordButton = ({
   showPassword,
 }: ShowPasswordButtonProps) => {
   return (
-    <div className="flex gap-x-3 items-center">
+    <div className="flex items-center gap-x-3">
       <Checkbox
         className="cursor-pointer"
         id="show-password"

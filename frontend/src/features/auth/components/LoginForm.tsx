@@ -20,26 +20,22 @@ import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signupSchema, signupType } from "../schemas/signup-schema";
 import SubmitButton from "@/components/SubmitButton";
-import { signupAction } from "../services/signup-service";
 import FormErrorMessage from "@/components/FormErrorMessage";
-import FormSuccessMessage from "@/components/FormSuccessMessage";
 import ShowPasswordButton from "./ShowPasswordButton";
+import { loginSchema, loginType } from "../schemas/login-schema";
+import { loginService } from "../services/login-service";
 import AuthFormLinkFooter from "./AuthFormLinkFooter";
 
-const SignupForm = () => {
-  const [success, setSuccess] = useState<string | undefined>(undefined);
+const LoginForm = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const form = useForm<signupType>({
+  const form = useForm<loginType>({
     defaultValues: {
-      email: "",
-      username: "",
+      identifier: "",
       password: "",
-      confirmPassword: "",
     },
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(loginSchema),
   });
 
   const {
@@ -49,10 +45,8 @@ const SignupForm = () => {
     },
   } = form;
 
-  const onSubmit = async (data: signupType) => {
-    setSuccess(undefined);
-
-    const res = await signupAction(data);
+  const onSubmit = async (data: loginType) => {
+    const res = await loginService(data);
 
     if (res?.error) {
       form.setError("root", {
@@ -61,16 +55,16 @@ const SignupForm = () => {
     }
 
     if (res?.success) {
-      setSuccess(res.success);
     }
   };
 
   return (
     <Card className="w-xl">
       <CardHeader>
-        <CardTitle>Inscrivez-vous sur groupe-sport</CardTitle>
+        <CardTitle>Connectez-vous sur groupe-sport</CardTitle>
         <CardDescription>
-          Utilisez votre email ou Strava pour vous créez un compte
+          Utilisez votre email ou nom d&apos;utilisateur ou Strava pour vous
+          connectez
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -80,25 +74,11 @@ const SignupForm = () => {
             onSubmit={form.handleSubmit((data) => onSubmit(data))}
           >
             <FormField
-              name="email"
+              name="identifier"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name="username"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom d&apos;utilisateur</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -124,34 +104,16 @@ const SignupForm = () => {
               )}
             />
 
-            <FormField
-              name="confirmPassword"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirmez le mot de passe</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type={showPassword ? "text" : "password"}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <ShowPasswordButton
               setShowPassword={() => setShowPassword((prev) => !prev)}
               showPassword={showPassword}
-              text="Afficher les mots de passe"
+              text="Afficher le mot de passe"
             />
 
             <FormErrorMessage message={rootError?.message} />
-            <FormSuccessMessage message={success} />
 
             <SubmitButton
-              text="S'inscrire"
+              text="Se connecter"
               isDisabled={isDisabled}
               className="w-full"
             />
@@ -161,13 +123,13 @@ const SignupForm = () => {
 
       <CardFooter>
         <AuthFormLinkFooter
-          text="Vous avez  déjà un compte ?"
-          href="/authentification/connexion"
-          textHref="Connectez-vous"
+          text="Vous n'avez pas de compte ?"
+          href="/authentification/inscription"
+          textHref="Inscrivez-vous"
         />
       </CardFooter>
     </Card>
   );
 };
 
-export default SignupForm;
+export default LoginForm;
