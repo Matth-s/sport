@@ -8,3 +8,16 @@ services:
     volumes:
       - ./backend:/app
       - /home/node/node_modules
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
