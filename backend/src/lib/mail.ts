@@ -50,11 +50,13 @@ export const sendEmailVerification = async ({
 
 export const sendPasswordResetEmail = async ({
   email,
-  url,
+  token,
 }: {
   email: string;
-  url: string;
+  token: string;
 }) => {
+  const url = `${frontendUrl}/authentification/nouveau-mot-de-passe?token=${token}`;
+
   const { error } = await resend.emails.send({
     from: 'Acme <onboarding@resend.dev>',
     to: [email],
