@@ -1,4 +1,5 @@
 import Sidebar from "@/components/Sidebar";
+import { cn } from "@/lib/utils";
 import React from "react";
 
 type MainLayoutProps = {
@@ -7,7 +8,7 @@ type MainLayoutProps = {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <main className="flex h-full">
+    <main className={cn("block h-full lg:flex")}>
       <Sidebar />
       {children}
     </main>
