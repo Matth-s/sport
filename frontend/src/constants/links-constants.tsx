@@ -1,4 +1,4 @@
-import { Calendar, Home, PersonStanding } from "lucide-react";
+import { Calendar, Home, MessageSquare, UsersRound } from "lucide-react";
 
 export const sidebarLinks = [
   {
@@ -8,13 +8,10 @@ export const sidebarLinks = [
   },
   {
     name: "Groupes",
-    path: "/",
-    logo: "",
-  },
-  {
-    name: "Amis",
-    path: "/",
-    logo: <PersonStanding />,
+    path: "/groupes",
+    logo: <UsersRound />,
   },
   { name: "Événements", path: "/evenements", logo: <Calendar /> },
+  { name: "Amis", path: "/amis", logo: <UsersRound /> },
+  { name: "Messages", path: "/messages", logo: <MessageSquare /> },
 ];
