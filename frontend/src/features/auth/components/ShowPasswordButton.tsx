@@ -14,7 +14,7 @@ const ShowPasswordButton = ({
   showPassword,
 }: ShowPasswordButtonProps) => {
   return (
-    <div className="flex items-center gap-x-3">
+    <div className="flex items-center gap-x-2">
       <Checkbox
         className="cursor-pointer"
         id="show-password"

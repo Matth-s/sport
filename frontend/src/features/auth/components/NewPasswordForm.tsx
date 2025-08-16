@@ -1,9 +1,11 @@
 "use client";
 
+import FormErrorMessage from "@/components/FormErrorMessage";
+import FormSuccessMessage from "@/components/FormSuccessMessage";
+import SubmitButton from "@/components/SubmitButton";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -19,24 +21,31 @@ import {
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import SubmitButton from "@/components/SubmitButton";
-import FormErrorMessage from "@/components/FormErrorMessage";
 import ShowPasswordButton from "./ShowPasswordButton";
-import { loginSchema, loginType } from "../schemas/login-schema";
-import { loginService } from "../services/login-service";
-import AuthFormLinkFooter from "./AuthFormLinkFooter";
-import Link from "next/link";
+import {
+  newPasswordSchema,
+  newPasswordType,
+} from "../services/new-password-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { newPasswordService } from "../services/new-password-service";
+import BackToLoginLink from "./BackToLoginLink";
 
-const LoginForm = () => {
+type NewPasswordFormProps = {
+  token: string;
+};
+
+const NewPasswordForm = ({ token }: NewPasswordFormProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [success, setSuccess] = useState<string | undefined>(undefined);
 
-  const form = useForm<loginType>({
+  const form = useForm<newPasswordType>({
     defaultValues: {
-      identifier: "",
       password: "",
+      confirmPassword: "",
+      token,
     },
-    resolver: zodResolver(loginSchema),
+
+    resolver: zodResolver(newPasswordSchema),
   });
 
   const {
@@ -46,11 +55,13 @@ const LoginForm = () => {
     },
   } = form;
 
-  const onSubmit = async (data: loginType) => {
-    const res = await loginService(data);
+  const onSubmit = async (data: newPasswordType) => {
+    setSuccess(undefined);
+
+    const res = await newPasswordService(data);
 
     if (res?.error) {
-      form.setError("root", {
+      return form.setError("root", {
         message: res.error,
       });
     }
@@ -59,82 +70,68 @@ const LoginForm = () => {
   return (
     <Card className="w-lg">
       <CardHeader>
-        <CardTitle>Connectez-vous sur groupe-sport</CardTitle>
-        <CardDescription>
-          Utilisez votre email ou nom d&apos;utilisateur ou Strava pour vous
-          connectez
-        </CardDescription>
+        <BackToLoginLink />
+        <CardTitle>Entrez votre nouveau mot de passe</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form
-            className="flex flex-col gap-y-4"
             onSubmit={form.handleSubmit((data) => onSubmit(data))}
+            className="flex flex-col gap-y-4"
           >
-            <FormField
-              name="identifier"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <FormField
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mot de passe</FormLabel>
+                  <FormLabel>Nouveau mot de passe</FormLabel>
                   <FormControl>
                     <Input
-                      {...field}
                       type={showPassword ? "text" : "password"}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                  <Link
-                    href="/authentification/mot-de-passe-oublie"
-                    className="ml-auto w-fit text-xs text-blue-500 hover:underline"
-                  >
-                    Mot de passe oublié ?
-                  </Link>
+            <FormField
+              name="confirmPassword"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirmez le nouveau mot de passe</FormLabel>
+                  <FormControl>
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
             <ShowPasswordButton
-              setShowPassword={() => setShowPassword((prev) => !prev)}
               showPassword={showPassword}
-              text="Afficher le mot de passe"
+              setShowPassword={() => setShowPassword((prev) => !prev)}
+              text="Afficher les mots de passe"
             />
 
+            <FormSuccessMessage message={success} />
             <FormErrorMessage message={rootError?.message} />
 
             <SubmitButton
-              text="Se connecter"
+              text="Modifier mon mot de passe"
               isDisabled={isDisabled}
               className="w-full"
             />
           </form>
         </Form>
       </CardContent>
-
-      <CardFooter>
-        <AuthFormLinkFooter
-          text="Vous n'avez pas de compte ?"
-          href="/authentification/inscription"
-          textHref="Inscrivez-vous"
-        />
-      </CardFooter>
     </Card>
   );
 };
 
-export default LoginForm;
+export default NewPasswordForm;

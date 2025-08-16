@@ -66,7 +66,7 @@ const SignupForm = () => {
   };
 
   return (
-    <Card className="w-xl">
+    <Card className="w-lg">
       <CardHeader>
         <CardTitle>Inscrivez-vous sur groupe-sport</CardTitle>
         <CardDescription>
